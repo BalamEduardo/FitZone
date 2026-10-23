@@ -1,0 +1,481 @@
+{
+  "info": {
+    "name": "FitZone - Reto 1 | Pruebas de API",
+    "_postman_id": "fab31573-2d73-40ca-91c5-a85c47f9bf83",
+    "description": "Colección con aserciones automáticas. Antes de ejecutar: correr fitzone_datos_prueba.sql y llenar las variables con los IDs obtenidos. Ejecutar UNA vez en el orden establecido. El código Java no se modifica. Las confirmaciones/recordatorios se verifican en la consola.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 · Estado de la API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/estado",
+        "description": "Se espera HTTP 200."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Aplicación FitZone funcionando\", () => { pm.expect(d.aplicacion).to.eql(\"FitZone\"); pm.expect(d.estado).to.eql(\"Funcionando\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "02 · Listar clases",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases",
+        "description": "Se espera HTTP 200."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Lista JSON de clases\", () => { pm.expect(d).to.be.an(\"array\"); pm.expect(d.length).to.be.greaterThan(0); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "03 · Consultar cupo libre",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases/{{idClaseRegistro}}/cupo",
+        "description": "Se espera HTTP 200."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Cupo inicial de 20\", () => { pm.expect(d.capacidadMaxima).to.eql(20); pm.expect(d.inscritos).to.eql(0); pm.expect(d.lugaresDisponibles).to.eql(20); pm.expect(d.hayCupo).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "04 · Clase no encontrada",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases/{{idClaseInexistente}}/cupo",
+        "description": "Se espera HTTP 404."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Código CLASE_NO_ENCONTRADA\", () => pm.expect(d.error).to.eql(\"CLASE_NO_ENCONTRADA\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "05 · Identificador inválido",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases/-1/cupo",
+        "description": "Se espera HTTP 400."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Código ID_INVALIDO\", () => pm.expect(d.error).to.eql(\"ID_INVALIDO\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "06 · Inscripción exitosa",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 201.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioValido}}, \"idClase\": {{idClaseRegistro}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Inscripción creada\", () => { pm.expect(d.idInscripcion).to.be.a(\"number\"); pm.expect(String(d.idSocio)).to.eql(pm.collectionVariables.get(\"idSocioValido\")); pm.expect(String(d.idClase)).to.eql(pm.collectionVariables.get(\"idClaseRegistro\")); });",
+              "pm.collectionVariables.set(\"idInscripcionCreada\", String(d.idInscripcion));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "07 · Inscripción duplicada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 409.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioValido}}, \"idClase\": {{idClaseRegistro}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Duplicado identificado\", () => pm.expect(d.error).to.eql(\"INSCRIPCION_DUPLICADA\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "08 · Membresía vencida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 409.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioVencido}}, \"idClase\": {{idClaseRegistro}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Membresía vencida identificada\", () => pm.expect(d.error).to.eql(\"MEMBRESIA_VENCIDA\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "09 · Socio inexistente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 404.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioInexistente}}, \"idClase\": {{idClaseRegistro}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Socio inexistente identificado\", () => pm.expect(d.error).to.eql(\"SOCIO_NO_ENCONTRADO\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "10 · Clase ya iniciada",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 409.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioSegundo}}, \"idClase\": {{idClasePasada}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Clase ya iniciada identificada\", () => pm.expect(d.error).to.eql(\"CLASE_YA_INICIADA\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "11 · Cupo agotado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 409.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": {{idSocioSegundo}}, \"idClase\": {{idClaseLlena}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Cupo agotado identificado\", () => pm.expect(d.error).to.eql(\"CUPO_AGOTADO\"));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "12 · Cupo lleno no modificado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases/{{idClaseLlena}}/cupo",
+        "description": "Se espera HTTP 200."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Un lugar ocupado, cero libres\", () => { pm.expect(d.capacidadMaxima).to.eql(1); pm.expect(d.inscritos).to.eql(1); pm.expect(d.lugaresDisponibles).to.eql(0); pm.expect(d.hayCupo).to.eql(false); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "13 · Cupo actualizado tras inscripción válida",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/clases/{{idClaseRegistro}}/cupo",
+        "description": "Se espera HTTP 200."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const d = pm.response.json();",
+              "pm.test(\"Quedan 19 lugares\", () => { pm.expect(d.inscritos).to.eql(1); pm.expect(d.lugaresDisponibles).to.eql(19); pm.expect(d.hayCupo).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "14 · Body con ID no positivo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/inscripciones",
+        "description": "Se espera HTTP 400.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSocio\": 0, \"idClase\": {{idClaseRegistro}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "idSocioValido",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idSocioSegundo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idSocioVencido",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idSocioInexistente",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idClaseRegistro",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idClaseLlena",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idClasePasada",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idClaseInexistente",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idInscripcionCreada",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
