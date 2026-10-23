@@ -40,6 +40,9 @@ public class GlobalExceptionHandler {
 
             case "ID_INVALIDO" ->
                 "El identificador proporcionado no es valido.";
+                
+            case "CLASE_YA_INICIADA" ->
+                "No es posible inscribirse a una clase que ya comenzo.";
 
             default -> "No se pudo completar la operacion.";
         };

@@ -2,6 +2,9 @@
 package com.api.fitzone.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,8 +24,12 @@ public class clase {
     @Column(nullable = false)
     private LocalDateTime fechaHora;
 
+    
+    @Min(value = 1, message = "La capacidad minima es 1")
+    @Max(value = 20, message = "La capacidad maxima es 20")
     @Column(nullable = false)
     private Integer capacidadMaxima = 20;
+    
 
     public Long getIdClase() {
         return idClase;
