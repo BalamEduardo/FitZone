@@ -5,13 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "inscripciones",
-    uniqueConstraints = @UniqueConstraint(
-        name = "uk_socio_clase",
-        columnNames = {"socio_id", "clase_id"}
-    )
-)
+@Table(name = "inscripciones", uniqueConstraints = @UniqueConstraint(name = "uk_socio_clase", columnNames = {
+        "socio_id", "clase_id" }))
 public class inscripcion {
 
     @Id
@@ -27,8 +22,18 @@ public class inscripcion {
     private clase clase;
 
     @Column(nullable = false)
-    private LocalDateTime fechaInscripcion =
-            LocalDateTime.now();
+    private LocalDateTime fechaInscripcion = LocalDateTime.now();
+
+    @Column(name = "recordatorio_enviado")
+    private Boolean recordatorioEnviado = false;
+
+    public Boolean getRecordatorioEnviado() {
+        return recordatorioEnviado;
+    }
+
+    public void setRecordatorioEnviado(Boolean recordatorioEnviado) {
+        this.recordatorioEnviado = recordatorioEnviado;
+    }
 
     public Long getIdInscripcion() {
         return idInscripcion;
