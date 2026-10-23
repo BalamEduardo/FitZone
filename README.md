@@ -47,14 +47,3 @@
 - **Capacidad máxima:** la restricción `CHECK (capacidad_maxima BETWEEN 1 AND 20)` ya fue creada en tu MySQL local. Un `INSERT` de capacidad `30` debe ser rechazado por MySQL. No se incluye como llamada de Postman porque la API no tiene endpoint para crear clases.
 - **Concurrencia:** el proyecto usa transacción y bloqueo pesimista, pero **no se ha ejecutado una prueba de carga simultánea**.
 
-## Observaciones de la versión definitiva del ZIP
-
-- El ZIP `FitZone (3).zip` sigue configurando `@Scheduled(fixedDelay = 10000)`: revisión cada **10 segundos**. Esto no impide los casos principales, pero difiere del ajuste a 60 segundos discutido previamente.
-- Tiene un archivo `application.properties` con una contraseña de MySQL escrita directamente. **No compartas o publiques ese archivo sin corregirlo.** La opción recomendada es utilizar `spring.datasource.password=${DB_PASSWORD}` y configurar `$env:DB_PASSWORD="TU_CONTRASENA"` en PowerShell antes de iniciar Spring Boot. Si ya se publicó la contraseña en el historial de Git, cambiar el archivo no borra el secreto de los commits antiguos: también debes cambiar la contraseña real y revisar el historial publicado.
-- La documentación académica señala un objetivo de respuesta inferior a dos segundos, pero ese objetivo **no ha sido medido**.
-
-## Recomendación para la entrega
-
-Sube el código del proyecto por un lado y el documento académico PDF por otro, tal como pide el profesor. Puedes agregar la colección Postman y el SQL de pruebas a una carpeta `pruebas/` del repositorio, después de resolver el problema de la contraseña. No necesitas subir el ZIP con la carpeta `.git/` interna.
-
-Las capturas de Postman que compartiste sirven como evidencia visual adicional; **no se han incorporado al PDF académico** para conservar el límite de 5 páginas y priorizar los criterios de la rúbrica.
