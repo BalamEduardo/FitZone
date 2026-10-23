@@ -243,4 +243,4 @@ Para ejecutar la prueba de arranque del contexto Spring incluida en el proyecto:
 ./mvnw test
 ```
 
-La prueba automatizada incluida comprueba la carga del contexto de la aplicación; no sustituye las pruebas de operaciones HTTP. Para ejecutarla debe estar disponible la conexión a MySQL configurada.
+La prueba automatizada incluida comprueba la carga del contexto de la aplicación; no sustituye las pruebas de operaciones HTTP. Para ejecutarla debe estar disponible la conexión a MySQL configurada
